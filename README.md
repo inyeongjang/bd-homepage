@@ -1,6 +1,6 @@
 **BD HomePage**
 
-**전체 구조**
+***전체 구조**
 
 bd-home-template/
 
@@ -24,7 +24,7 @@ bd-home-template/
 
 
 
-**사용 방법**
+***사용 방법**
 
 0️⃣ 사전 준비
 
@@ -63,13 +63,7 @@ GitHub Actions 탭에서 모두 초록 표시(✅) 인지 확인
 
 
 
-
-
-
-
-
-
-**배포 결과물**
+***배포 결과물**
 
 스크립트 실행 후 아래 두 개가 자동으로 생성됩니다.
 
@@ -85,7 +79,7 @@ Health Check 엔드포인트: https://<fly-app-name>.fly.dev/api/health
 
 
 
-**Dev Stack **
+***Dev Stack **
 
 Backend: Spring Boot + Fly.io
 
