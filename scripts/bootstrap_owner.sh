@@ -33,13 +33,11 @@ fly auth whoami >/dev/null 2>&1 || { echo "!! Run: fly auth login"; exit 1; }
 OWNER="$(gh api user -q .login)"
 echo "==> GitHub owner: $OWNER"
 
-# 운영 레포 이름(충돌 방지: 기본은 bd-home-<owner>)
 OPS_REPO="${OPS_REPO:-bd-home-${OWNER}}"
 VISIBILITY="${VISIBILITY:-public}"   # Pages 쓰려면 public 권장
 
 echo "==> Target 운영 repo: ${OWNER}/${OPS_REPO} (${VISIBILITY})"
 
-# 2) create/repoint repo
 if ! gh repo view "${OWNER}/${OPS_REPO}" >/dev/null 2>&1; then
   gh repo create "${OPS_REPO}" --"${VISIBILITY}"
 fi
@@ -47,19 +45,19 @@ fi
 git remote remove origin 2>/dev/null || true
 git remote add origin "https://github.com/${OWNER}/${OPS_REPO}.git"
 
-# 템플릿을 운영 레포로 밀어넣기(초기화 의도)
+
 git add -A || true
 git commit -m "chore: init from bd-home-template" || true
 git branch -M main
 git push -u origin main --force-with-lease
 
-# 3) backend/frontend 세팅
+
 echo
 echo "==> Setup backend & frontend inside this repo"
 ./scripts/bootstrap_backend.sh
 ./scripts/bootstrap_frontend.sh
 
-# 4) push changes (generated backend/frontend + workflows)
+
 echo
 echo "==> Push generated contents"
 git add -A
