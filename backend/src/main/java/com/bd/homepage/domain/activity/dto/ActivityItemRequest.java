@@ -12,6 +12,8 @@ public class ActivityItemRequest {
     private String title;
     private String href;
     private String image;
+    private String iconKey;
+    private String iconUrl;
     private Integer orderIndex;
     private Boolean isActive;
 }

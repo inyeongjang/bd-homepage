@@ -16,6 +16,8 @@ public class ActivityItemResponse {
     private String title;
     private String href;
     private String image;
+    private String iconKey;
+    private String iconUrl;
     private Integer orderIndex;
     private Boolean isActive;
     private LocalDateTime createdAt;
@@ -29,6 +31,8 @@ public class ActivityItemResponse {
                 .title(entity.getTitle())
                 .href(entity.getHref())
                 .image(entity.getImage())
+                .iconKey(entity.getIconKey())
+                .iconUrl(entity.getIconUrl())
                 .orderIndex(entity.getOrderIndex())
                 .isActive(entity.getIsActive())
                 .createdAt(entity.getCreatedAt())

@@ -35,6 +35,12 @@ public class ActivityItem {
     @Column(length = 500)
     private String image;  // 이미지 URL/경로
 
+    @Column(length = 50)
+    private String iconKey; // 아이콘 키
+
+    @Column(length = 500)
+    private String iconUrl; // 커스텀 아이콘 이미지 URL
+
     @Column(nullable = false)
     @Builder.Default
     private Integer orderIndex = 0; // 정렬용
@@ -57,6 +63,8 @@ public class ActivityItem {
             String title,
             String href,
             String image,
+            String iconKey,
+            String iconUrl,
             Integer orderIndex,
             Boolean isActive
     ) {
@@ -65,6 +73,8 @@ public class ActivityItem {
         this.title = title;
         this.href = href;
         this.image = image;
+        this.iconKey = iconKey;
+        this.iconUrl = iconUrl;
         this.orderIndex = orderIndex;
         this.isActive = isActive;
     }
