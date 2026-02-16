@@ -40,7 +40,7 @@ export OWNER OPS_REPO FLY_APP
 echo "==> Target 운영 repo: ${OWNER}/${OPS_REPO} (${VISIBILITY})"
 
 if ! gh repo view "${OWNER}/${OPS_REPO}" >/dev/null 2>&1; then
-  gh repo create "${OPS_REPO}" --"${VISIBILITY}"
+  gh repo create "${OWNER}/${OPS_REPO}" --"${VISIBILITY}"
 fi
 
 git remote remove origin 2>/dev/null || true
