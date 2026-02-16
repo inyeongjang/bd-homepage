@@ -1,92 +1,45 @@
-**BD HomePage**
+# 🚪BackDoor 홈페이지 운영 매뉴얼
 
-***전체 구조**
+### 1️⃣ 시스템 구조 요약  
 
-bd-home-template/
-
-├─ backend/              # (자동 생성됨) Spring Boot 백엔드
-
-├─ frontend/             # (자동 생성됨) 정적 HTML/JS 프론트
-
-├─ scripts/              # 운영자용 bootstrap 스크립트
-
-├─ .github/workflows/    # CI/CD (Fly.io, GitHub Pages)
-
-└─ README.md
+| 영역       | 설명                             |
+| -------- | ------------------------------ |
+| Backend  | Spring Boot (Fly.io 배포)        |
+| Frontend | 정적 HTML / JS (GitHub Pages 배포) |
+| CI/CD    | GitHub Actions 자동 배포           |
+| 인증       | JWT + BCrypt (환경변수 기반)         |
 
 
+### 2️⃣ 레포지토리 구조
 
+```
+backend/        # API 서버 (Spring Boot)
+frontend/       # 정적 페이지 파일
+scripts/        # 초기 세팅용 (운영 중에는 거의 사용 안함)
+.github/workflows/
+```
 
-⚠️ backend/, frontend/는 스크립트 실행 시 자동 생성됩니다.
+### 3️⃣ 수정 방법
+- 코드 수정 → commit → push → GitHub Actions 성공 확인
+- FE : `pages-frontend.yml`
+- BE : `fly-backend.yml`
 
-⚠️ 스크립트 실행 시 GitHub 또는 Fly.io에 로그인되어 있지 않으면 자동으로 로그인 안내가 표시되며, 최초 1회 인증 후 계속 진행됩니다.
+### 4️⃣ 관리자 비밀번호 변경 방법
 
+**⚠️ 비밀번호 원문은 절대 Git에 업로드 금지**
+**⚠️ ADMIN_PASSWORD_HASH, JWT_SECRET 모두 Fly secrets로 관리**
 
-
-
-***사용 방법**
-
-0️⃣ 사전 준비
-
-GitHub 계정
-
-Fly.io 계정 (무료)
-
-WSL 또는 Linux/macOS 환경
-
-
-1️⃣ 템플릿 clone
-
-git clone https://github.com/<owner>/bd-home-template.git
-
-cd bd-home-template
-
-
-2️⃣ 스크립트 실행 권한 부여
-
-chmod +x scripts/*.sh
-
-
-3️⃣ 운영 레포 / 앱 이름 지정 후 실행
-
-export OPS_REPO="bd-home-<깃허브 아이디나 원하는 단어..>"
-
-export FLY_APP="bd-homepage-<위와 동일>"
-
-./scripts/bootstrap_owner.sh
-
-
-4️⃣ 배포 확인
-
-GitHub Actions 탭에서 모두 초록 표시(✅) 인지 확인
-
-⚠️ 만일 fly-backend.yml은 초록 표시 뜨는데 pages-frontend.yml만 에러 날 경우 pages 설정 문제!
-
-settings -> pages -> Build and deployment -> Source를 Github Actions로 변경 
-
-이 경우 90% 문제 해결됨
-
-
-
-***배포 결과물**
-
-스크립트 실행 후 아래 두 개가 자동으로 생성됩니다.
-
-1️⃣ 프론트엔드 (GitHub Pages)
-
-URL 예시: https://<github-id>.github.io/<repo-name>/
-
-2️⃣ 백엔드 (Fly.io)
-
-Health Check 엔드포인트: https://<fly-app-name>.fly.dev/api/health
-
-
-
-
-***Dev Stack **
-
-Backend: Spring Boot + Fly.io
-
-Frontend: HTML / JS + GitHub Pages
-
-CI/CD: GitHub Actions
+1. BCrypt 해시 생성
+   ```
+   new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+    .encode("새 비밀번호");
+   ```
+2. Fly 환경변수 교체
+   ```
+   fly secrets set ADMIN_PASSWORD_HASH='생성된_해시값'
+   ```
+3. 로그인 테스트
+   ```
+   curl -X POST https://<fly-app>.fly.dev/api/admin/auth/login \
+   -H "Content-Type: application/json" \
+   -d '{"password":"새 비밀번호"}'
