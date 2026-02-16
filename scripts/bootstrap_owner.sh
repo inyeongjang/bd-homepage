@@ -30,11 +30,12 @@ echo "==> Auth check (1-time browser login if needed)"
 gh auth status >/dev/null 2>&1 || { echo "!! Run: gh auth login"; exit 1; }
 fly auth whoami >/dev/null 2>&1 || { echo "!! Run: fly auth login"; exit 1; }
 
-OWNER="$(gh api user -q .login)"
+OWNER="${GH_OWNER:-${ORG:-$(gh api user -q .login)}}"
+FLY_APP="${FLY_APP:-${OWNER}}"
 echo "==> GitHub owner: $OWNER"
-
-OPS_REPO="${OPS_REPO:-bd-home-${OWNER}}"
-VISIBILITY="${VISIBILITY:-public}"   # Pages 쓰려면 public 권장
+OPS_REPO="${OPS_REPO:-${OWNER}.github.io}"
+VISIBILITY="${VISIBILITY:-public}"
+export OWNER OPS_REPO FLY_APP
 
 echo "==> Target 운영 repo: ${OWNER}/${OPS_REPO} (${VISIBILITY})"
 
@@ -71,5 +72,9 @@ echo "- Frontend deploy: GitHub Actions -> GitHub Pages"
 echo
 echo "Check:"
 echo "  GitHub repo: https://github.com/${OWNER}/${OPS_REPO}"
-echo "  (After first backend deploy) Fly URL: https://bd-homepage-${OWNER}.fly.dev/api/health"
-echo "  Pages URL: https://${OWNER}.github.io/${OPS_REPO}/"
+echo "  (After first backend deploy) Fly URL: https://${FLY_APP}.fly.dev/api/health"
+if [ "${OPS_REPO}" = "${OWNER}.github.io" ]; then
+  echo "  Pages URL: https://${OWNER}.github.io/"
+else
+  echo "  Pages URL: https://${OWNER}.github.io/${OPS_REPO}/"
+fi

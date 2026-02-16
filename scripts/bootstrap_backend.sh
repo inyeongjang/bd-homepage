@@ -25,8 +25,8 @@ fi
 gh auth status >/dev/null 2>&1 || { echo "!! Run: gh auth login"; exit 1; }
 fly auth whoami >/dev/null 2>&1 || { echo "!! Run: fly auth login"; exit 1; }
 
-OWNER="$(gh api user -q .login)"
-FLY_APP="${FLY_APP:-bd-homepage-${OWNER}}"
+OWNER="${GH_OWNER:-${ORG:-$(gh api user -q .login)}}"
+FLY_APP="${FLY_APP:-${OWNER}}"
 JAVA_VERSION="${JAVA_VERSION:-17}"
 PKG="${PKG:-com.bd.homepage}"
 
@@ -53,8 +53,11 @@ curl -fsSL "https://start.spring.io/starter.zip" \
 unzip -q /tmp/sb.zip -d backend
 
 # Minimal API
-cat > backend/src/main/java/com/bd/homepage/HealthController.java <<'EOF'
-package com.bd.homepage;
+PKG_PATH="$(echo "$PKG" | tr '.' '/')"
+mkdir -p "backend/src/main/java/${PKG_PATH}"
+
+cat > "backend/src/main/java/${PKG_PATH}/HealthController.java" <<EOF
+package ${PKG};
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,8 +72,8 @@ public class HealthController {
 EOF
 
 # CORS (Pages uses https://<owner>.github.io and repo path)
-cat > backend/src/main/java/com/bd/homepage/CorsConfig.java <<EOF
-package com.bd.homepage;
+cat > "backend/src/main/java/${PKG_PATH}/CorsConfig.java" <<EOF
+package ${PKG};
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

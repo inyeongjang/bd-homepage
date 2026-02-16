@@ -18,30 +18,23 @@ fi
 
 gh auth status >/dev/null 2>&1 || { echo "!! Run: gh auth login"; exit 1; }
 
-OWNER="$(gh api user -q .login)"
-OPS_REPO="${OPS_REPO:-bd-home-${OWNER}}"
-FLY_APP="${FLY_APP:-bd-homepage-${OWNER}}"
+OWNER="${GH_OWNER:-${ORG:-$(gh api user -q .login)}}"
+OPS_REPO="${OPS_REPO:-${OWNER}.github.io}"
+FLY_APP="${FLY_APP:-${OWNER}}"
 
 echo "==> Owner: $OWNER"
 echo "==> Repo:  $OPS_REPO"
 echo "==> Fly:   $FLY_APP"
-echo "==> Recreate frontend/"
+echo "==> Ensure frontend/ exists (preserve existing)"
 
-rm -rf frontend
 mkdir -p frontend
 
 cat > frontend/config.js <<EOF
 window.API_BASE = "https://${FLY_APP}.fly.dev";
 EOF
 
-cat > frontend/app.js <<'EOF'
-fetch(`${window.API_BASE}/api/health`)
-  .then(r => r.text())
-  .then(t => document.getElementById("out").innerText = t)
-  .catch(e => document.getElementById("out").innerText = String(e));
-EOF
-
-cat > frontend/index.html <<'EOF'
+if [ ! -f frontend/index.html ]; then
+  cat > frontend/index.html <<'EOF'
 <!doctype html>
 <html lang="ko">
 <head>
@@ -58,5 +51,15 @@ cat > frontend/index.html <<'EOF'
 </body>
 </html>
 EOF
+fi
 
-echo "✅ frontend/ created."
+if [ ! -f frontend/app.js ]; then
+  cat > frontend/app.js <<'EOF'
+fetch(`${window.API_BASE}/api/health`)
+  .then(r => r.text())
+  .then(t => document.getElementById("out").innerText = t)
+  .catch(e => document.getElementById("out").innerText = String(e));
+EOF
+fi
+
+echo "✅ frontend/ preserved. Updated frontend/config.js only."
